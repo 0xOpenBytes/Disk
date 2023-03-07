@@ -12,4 +12,4 @@ import o
  - `let data = try Disk.data(filename : "file.txt")`
  - `try Disk.out("Hello, world!", filename: "greeting.txt")`
  */
-typealias Disk = o.file
+public typealias Disk = o.file
