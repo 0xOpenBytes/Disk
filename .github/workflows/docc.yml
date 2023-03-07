@@ -1,0 +1,41 @@
+name: docc
+on:
+  push:
+    branches: ["main"]
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+jobs:
+  pages:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: macos-12
+    steps:
+      - name: git checkout
+        uses: actions/checkout@v3
+      - name: docbuild
+        run: |
+          xcodebuild docbuild -scheme Disk \
+            -derivedDataPath /tmp/docbuild \
+            -destination 'generic/platform=iOS';
+          $(xcrun --find docc) process-archive \
+            transform-for-static-hosting /tmp/docbuild/Build/Products/Debug-iphoneos/Disk.doccarchive \
+            --hosting-base-path Disk \
+            --output-path docs;
+          echo "<script>window.location.href += \"/documentation/disk\"</script>" > docs/index.html;
+      - name: artifacts
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: 'docs'
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v1
+Symbols
+Symbol outline not available for this file
+To inspect a symbol, try clicking on the symbol directly in the code view.
+Code navigation supports a limited number of languages. See which languages are supported.
